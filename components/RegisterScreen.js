@@ -15,9 +15,19 @@ const RegisterScreen = ({ navigation }) => {
       Alert.alert('Success', 'User registered successfully');
       navigation.navigate('Login');
     } catch (error) {
-      Alert.alert('Error', error.response.data.message || 'An error occurred');
+      let errorMessage = 'An error occurred';
+  
+      if (error.response) {
+        errorMessage = error.response.data.message || errorMessage;
+      } else if (error.request) {
+        errorMessage = 'No response received from server';
+      } else {
+        errorMessage = error.message;
+      }
+  
+      Alert.alert('Error', errorMessage);
     }
-  };
+  };  
 
   return (
     <View style={styles.container}>
