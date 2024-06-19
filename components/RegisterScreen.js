@@ -1,42 +1,37 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import axios from 'axios';
+import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '../firebaseConfig';
+import { doc, setDoc } from 'firebase/firestore';
 
 const RegisterScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleRegister = async () => {
+  const handleSignUp = async () => {
     try {
-      const response = await axios.post('http://localhost:5001/register', {
-        username,
-        password,
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Add user to Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
       });
-      Alert.alert('Success', 'User registered successfully');
+
+      Alert.alert('Registration successful!', 'You are now registered.');
       navigation.navigate('Login');
     } catch (error) {
-      let errorMessage = 'An error occurred';
-  
-      if (error.response) {
-        errorMessage = error.response.data.message || errorMessage;
-      } else if (error.request) {
-        errorMessage = 'No response received from server';
-      } else {
-        errorMessage = error.message;
-      }
-  
-      Alert.alert('Error', errorMessage);
+      Alert.alert('Registration failed!', error.message);
     }
-  };  
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
       <TextInput
         style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
@@ -45,7 +40,7 @@ const RegisterScreen = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
       />
-      <Button title="Register" onPress={handleRegister} />
+      <Button title="Sign Up" onPress={handleSignUp} />
     </View>
   );
 };
@@ -56,14 +51,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
   input: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
