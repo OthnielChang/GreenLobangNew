@@ -1,35 +1,31 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import axios from 'axios';
+import { View, TextInput, Button, Alert, StyleSheet, TouchableOpacity } from 'react-native';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
 
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false); // State for password visibility
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:5001/login', {
-        username,
-        password,
-      });
-      const { token } = response.data;
-      await AsyncStorage.setItem('userToken', token);
+      await signInWithEmailAndPassword(auth, email, password);
+      Alert.alert('Login Successful!', 'You are logged in.');
       navigation.replace('Home');
     } catch (error) {
-      Alert.alert('Error', error.response.data.message || 'An error occurred');
+      Alert.alert('Login Failed!', error.message);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
       />
       <View style={styles.passwordContainer}>
         <TextInput
@@ -66,14 +62,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
   input: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
