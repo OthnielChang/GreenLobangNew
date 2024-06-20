@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import moment from 'moment';
 import Swiper from 'react-native-swiper';
+import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
+import { auth, db } from '../firebaseConfig';
 
 const { width } = Dimensions.get('window');
 
@@ -41,18 +43,47 @@ export default function Calendar() {
 
   const addEvent = async () => {
     try {
-      await addDoc(collection(db, 'events'), {
-        title: newEventTitle,
-        description: newEventDescription,
-        date: value,
-      });
-      setNewEventTitle('');
-      setNewEventDescription('');
-      fetchEvents(); 
+      if (auth.currentUser) {
+        await addDoc(collection(db, 'events'), {
+          title: newEventTitle,
+          description: newEventDescription,
+          date: value,
+          uid: auth.currentUser.uid, // Add user ID to the event data
+        });
+        setNewEventTitle('');
+        setNewEventDescription('');
+        fetchEvents();
+      } else {
+        Alert.alert('Error', 'You must be logged in to add events');
+      }
     } catch (error) {
       console.error("Error adding event: ", error);
     }
   };
+
+  const fetchEvents = async () => {
+    try {
+      if (auth.currentUser) {
+        const q = query(collection(db, 'events'), where('date', '==', value));
+        const querySnapshot = await getDocs(q);
+        const eventsData = [];
+        querySnapshot.forEach((doc) => {
+          const eventData = doc.data();
+          eventData.date = eventData.date.toDate(); // Convert Firestore Timestamp to Date
+          eventsData.push({ ...eventData, id: doc.id });
+        });
+        setEvents(eventsData);
+      } else {
+        Alert.alert('Error', 'You must be logged in to view events');
+      }
+    } catch (error) {
+      console.error("Error fetching events: ", error);
+    }
+  };  
+
+  useEffect(() => {
+    fetchEvents();
+  }, [value]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -153,7 +184,7 @@ export default function Calendar() {
         <View style={styles.footer}>
           <TouchableOpacity
             onPress={() => {
-              // handle onPress
+              addEvent
             }}>
             <View style={styles.btn}>
               <Text style={styles.btnText}>Schedule</Text>
@@ -246,7 +277,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     flexBasis: 0,
   },
-  /** Button */
+  /** Schedule Button */
   btn: {
     flexDirection: 'row',
     alignItems: 'center',

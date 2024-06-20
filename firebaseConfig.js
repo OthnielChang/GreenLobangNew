@@ -1,6 +1,5 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth, initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -14,8 +13,8 @@ const firebaseConfig = {
     measurementId: "G-377N4PZ4DN"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// so that it wont be auth everytime
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Initialize Firebase Authentication
 const auth = initializeAuth(app, {
