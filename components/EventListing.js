@@ -3,6 +3,8 @@ import { View, Text, TextInput, Button, StyleSheet, Image, Alert, TouchableOpaci
 import { launchImageLibrary } from 'react-native-image-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 
 const EventListing = () => {
   const [title, setTitle] = useState('');
@@ -28,11 +30,26 @@ const EventListing = () => {
     });
   };
 
-  const handleSubmit = () => {
-    // Handle form submission logic here
-    // For example, you could save the event to Firebase or your backend
-    Alert.alert('Event Submitted', `Title: ${title}\nDescription: ${description}\nDate: ${date}\nTime: ${time}`);
-  };
+  const handleSubmit = async () => {
+    try {
+        await addDoc(collection(db, 'events'), {
+          title,
+          description,
+          date,
+          time,
+          imageUri,
+        });
+        Alert.alert('Event Submitted', 'Your event has been submitted successfully!');
+        setTitle('');
+        setDescription('');
+        setDate('');
+        setTime('');
+        setImageUri(null);
+      } catch (error) {
+        Alert.alert('Error', 'There was an error submitting your event.');
+        console.error("Error adding document: ", error);
+      }
+    };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
