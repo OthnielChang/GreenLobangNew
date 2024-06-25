@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, Modal, ImageBackground } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; // Add icons
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
@@ -20,70 +20,83 @@ const HomeScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => setSidebarVisible(true)}>
-          <FontAwesome name="bars" size={24} color="#000000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Home</Text>
-      </View>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={sidebarVisible}
-        onRequestClose={() => {
-          setSidebarVisible(!sidebarVisible);
-        }}
-      >
-        <Sidebar navigation={navigation} closeModal={() => setSidebarVisible(false)} />
-      </Modal>
-
-      <View style={styles.buttonsContainer}>
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('Calendar')}
-          >
-            <Image source={require('../assets/calendar.png')} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Calendar</Text>
+    <ImageBackground 
+      source={require('../assets/background-2.png')} 
+      style={styles.background}
+    >
+      <View style={styles.overlay} />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.menuButton} onPress={() => setSidebarVisible(true)}>
+            <FontAwesome name="bars" size={24} color="#000000" />
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('EventListing')}
-          >
-            <Image source={require('../assets/event-listing.png')} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Event Listing</Text>
-          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Home</Text>
         </View>
 
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('EventViewing')}
-          >
-            <Image source={require('../assets/event-viewing.png')} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Event Viewing</Text>
-          </TouchableOpacity>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={sidebarVisible}
+          onRequestClose={() => {
+            setSidebarVisible(!sidebarVisible);
+          }}
+        >
+          <Sidebar navigation={navigation} closeModal={() => setSidebarVisible(false)} />
+        </Modal>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleSignOut}
-          >
-            <Image source={require('../assets/logout.png')} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Sign Out</Text>
-          </TouchableOpacity>
+        <View style={styles.buttonsContainer}>
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Calendar')}
+            >
+              <Image source={require('../assets/calendar.png')} style={styles.buttonImage} />
+              <Text style={styles.buttonText}>Calendar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('EventListing')}
+            >
+              <Image source={require('../assets/event-listing.png')} style={styles.buttonImage} />
+              <Text style={styles.buttonText}>Event Listing</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('EventViewing')}
+            >
+              <Image source={require('../assets/event-viewing.png')} style={styles.buttonImage} />
+              <Text style={styles.buttonText}>Event Viewing</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleSignOut}
+            >
+              <Image source={require('../assets/logout.png')} style={styles.buttonImage} />
+              <Text style={styles.buttonText}>Sign Out</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // to adjust transparency
+  },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     backgroundColor: '#FAC898',

@@ -3,14 +3,14 @@ import { View, Text, TextInput, Button, StyleSheet, Image, Alert, TouchableOpaci
 import { launchImageLibrary } from 'react-native-image-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { db, auth } from '../firebaseConfig';
 
 const EventListing = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [date, setDate] = useState(null);
+  const [time, setTime] = useState(null);
   const [imageUri, setImageUri] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
@@ -32,24 +32,28 @@ const EventListing = () => {
 
   const handleSubmit = async () => {
     try {
-        await addDoc(collection(db, 'events'), {
-          title,
-          description,
-          date,
-          time,
-          imageUri,
-        });
-        Alert.alert('Event Submitted', 'Your event has been submitted successfully!');
-        setTitle('');
-        setDescription('');
-        setDate('');
-        setTime('');
-        setImageUri(null);
-      } catch (error) {
-        Alert.alert('Error', 'There was an error submitting your event.');
-        console.error("Error adding document: ", error);
-      }
-    };
+      const user = auth.currentUser;
+      const eventDate = date ? Timestamp.fromDate(date) : null;
+      const eventTime = time ? Timestamp.fromDate(time) : null;
+      await addDoc(collection(db, 'events'), {
+        title,
+        description,
+        date: eventDate,
+        time: eventTime,
+        imageUri,
+        userId: user.uid,
+      });
+      Alert.alert('Event Submitted', 'Your event has been submitted successfully!');
+      setTitle('');
+      setDescription('');
+      setDate(null);
+      setTime(null);
+      setImageUri(null);
+    } catch (error) {
+      Alert.alert('Error', 'There was an error submitting your event.');
+      console.error("Error adding document: ", error);
+    }
+  };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -60,8 +64,7 @@ const EventListing = () => {
   };
 
   const handleConfirmDate = (selectedDate) => {
-    const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
-    setDate(formattedDate);
+    setDate(selectedDate);
     hideDatePicker();
   };
 
@@ -74,8 +77,7 @@ const EventListing = () => {
   };
 
   const handleConfirmTime = (selectedTime) => {
-    const formattedTime = moment(selectedTime).format('HH:mm');
-    setTime(formattedTime);
+    setTime(selectedTime);
     hideTimePicker();
   };
 
@@ -100,7 +102,7 @@ const EventListing = () => {
       
       <Text style={styles.label}>Event Date</Text>
       <TouchableOpacity onPress={showDatePicker} style={styles.input}>
-        <Text>{date ? date : 'Select event date'}</Text>
+        <Text>{date ? moment(date).format('YYYY-MM-DD') : 'Select event date'}</Text>
       </TouchableOpacity>
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
@@ -111,7 +113,7 @@ const EventListing = () => {
 
       <Text style={styles.label}>Event Time</Text>
       <TouchableOpacity onPress={showTimePicker} style={styles.input}>
-        <Text>{time ? time : 'Select event time'}</Text>
+        <Text>{time ? moment(time).format('HH:mm') : 'Select event time'}</Text>
       </TouchableOpacity>
       <DateTimePickerModal
         isVisible={isTimePickerVisible}

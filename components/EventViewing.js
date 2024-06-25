@@ -1,96 +1,144 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator } from 'react-native';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebaseConfig'; // Ensure this path is correct
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { db, auth } from '../firebaseConfig';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import moment from 'moment';
+import Swiper from 'react-native-swiper';
+import { Timestamp } from 'firebase/firestore';
 
-const EventViewing = () => {
+const EventViewing = ({ navigation }) => {
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchEvents = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'events'));
-      const eventsData = [];
-      querySnapshot.forEach((doc) => {
-        const eventData = doc.data();
-        eventsData.push({
-          ...eventData,
-          date: eventData.date && eventData.date.toDate ? moment(eventData.date.toDate()).format('YYYY-MM-DD') : '',
-          time: eventData.time && eventData.time.toDate ? moment(eventData.time.toDate()).format('HH:mm') : '',
-          id: doc.id,
-        });
-      });
-      setEvents(eventsData);
-    } catch (error) {
-      console.error("Error fetching events: ", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [selectedDay, setSelectedDay] = useState(new Date());
 
   useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        if (auth.currentUser) {
+          const startOfDay = Timestamp.fromDate(moment(selectedDay).startOf('day').toDate());
+          const endOfDay = Timestamp.fromDate(moment(selectedDay).endOf('day').toDate());
+          const q = query(
+            collection(db, 'events'),
+            where('date', '>=', startOfDay),
+            where('date', '<=', endOfDay)
+          );
+          const querySnapshot = await getDocs(q);
+          const eventsData = [];
+          querySnapshot.forEach((doc) => {
+            const eventData = doc.data();
+            if (eventData.date && eventData.time) {
+              eventData.date = eventData.date.toDate(); // Convert Firestore Timestamp to Date
+              eventData.time = eventData.time.toDate(); // Convert Firestore Timestamp to Date
+              console.log("Fetched event:", eventData); // Debug: Log fetched event
+              eventsData.push({ ...eventData, id: doc.id });
+            } else {
+              console.warn("Missing date or time in event:", eventData); //to handle missing data gracefully
+            }
+          });
+          console.log("All fetched events:", eventsData); // Debug: Log all fetched events
+          setEvents(eventsData);
+        } else {
+          Alert.alert('Error', 'You must be logged in to view events');
+        }
+      } catch (error) {
+        console.error("Error fetching events: ", error);
+      }
+    };
+
     fetchEvents();
-  }, []);
+  }, [selectedDay]);
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />;
-  }
+  const handleDayPress = (day) => {
+    setSelectedDay(new Date(day));
+    console.log("Selected day:", day); // Debug: Log selected day
+  };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.eventContainer}>
+  const renderEvent = ({ item }) => (
+    <TouchableOpacity
+      style={styles.eventContainer}
+      onPress={() =>
+        navigation.navigate('EventDetail', {
+          event: { ...item, date: item.date.toISOString(), time: item.time.toISOString() }, // Pass date and time as ISO strings
+        })
+      }
+    >
       <Text style={styles.eventTitle}>{item.title}</Text>
       <Text style={styles.eventDescription}>{item.description}</Text>
-      <Text style={styles.eventDateTime}>{item.date} at {item.time}</Text>
-      {item.imageUri ? <Image source={{ uri: item.imageUri }} style={styles.eventImage} /> : null}
-    </View>
+      <Text style={styles.eventDate}>
+        {moment(item.date).format('YYYY-MM-DD')} at {moment(item.time).format('HH:mm')}
+      </Text>
+    </TouchableOpacity>
   );
 
+  const renderDays = () => {
+    const days = [];
+    for (let i = -3; i <= 3; i++) {
+      const day = new Date();
+      day.setDate(selectedDay.getDate() + i);
+      days.push(day);
+    }
+    return days.map((day, index) => (
+      <TouchableOpacity key={index} onPress={() => handleDayPress(day)}>
+        <Text style={[styles.dayText, day.toDateString() === selectedDay.toDateString() && styles.selectedDayText]}>
+          {day.toDateString()}
+        </Text>
+      </TouchableOpacity>
+    ));
+  };
+
   return (
-    <FlatList
-      data={events}
-      keyExtractor={(item) => item.id}
-      renderItem={renderItem}
-      contentContainerStyle={styles.list}
-    />
+    <View style={styles.container}>
+      <Swiper showsPagination={false} loop={false} index={3}>
+        {renderDays()}
+      </Swiper>
+      <FlatList
+        data={events}
+        keyExtractor={(item) => item.id}
+        renderItem={renderEvent}
+        contentContainerStyle={styles.listContent}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  loader: {
+  container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 16,
   },
-  list: {
-    padding: 20,
+  listContent: {
+    paddingBottom: 16,
   },
   eventContainer: {
-    marginBottom: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 5,
+    padding: 16,
+    marginBottom: 16,
     backgroundColor: '#fff',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
   },
   eventTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 10,
   },
   eventDescription: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  eventDateTime: {
+    marginTop: 8,
     fontSize: 14,
-    color: '#888',
-    marginBottom: 10,
+    color: '#555',
   },
-  eventImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 5,
+  eventDate: {
+    marginTop: 8,
+    fontSize: 12,
+    color: '#888',
+  },
+  dayText: {
+    fontSize: 16,
+    padding: 8,
+  },
+  selectedDayText: {
+    fontWeight: 'bold',
+    color: 'blue',
   },
 });
 
