@@ -1,12 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, Modal, ImageBackground } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons'; // Add icons
-import { signOut } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
-import Sidebar from './Sidebar';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Modal, Image } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import { signOut, getAuth } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
+import Sidebar from './Sidebar'; // Import your custom Sidebar component
 
 const HomeScreen = ({ navigation }) => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [username, setUsername] = useState('');
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    fetchUsername();
+  }, []);
+
+  const fetchUsername = async () => {
+    try {
+      const docRef = doc(db, 'users', user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setUsername(docSnap.data().username);
+      }
+    } catch (error) {
+      console.log('Error fetching username:', error);
+    }
+  };
 
   const handleSignOut = () => {
     signOut(auth)
@@ -30,7 +51,7 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity style={styles.menuButton} onPress={() => setSidebarVisible(true)}>
             <FontAwesome name="bars" size={24} color="#000000" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Home</Text>
+          <Text style={styles.headerTitle}>Welcome Back {username} !</Text>
         </View>
 
         <Modal
@@ -127,7 +148,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '100%',
   },
-  button: {
+  button: { //component buttons
     flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: '#FAC898',

@@ -1,3 +1,4 @@
+// Sidebar.js
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { signOut } from 'firebase/auth';
@@ -25,6 +26,9 @@ const Sidebar = ({ navigation, closeModal }) => {
       <TouchableOpacity style={styles.sidebarButton} onPress={() => { navigation.navigate('Profile'); closeModal(); }}>
         <Text style={styles.sidebarButtonText}>Profile</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.sidebarButton} onPress={() => { navigation.navigate('AboutUs'); closeModal(); }}>
+        <Text style={styles.sidebarButtonText}>About Us</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.sidebarButton} onPress={handleSignOut}>
         <Text style={styles.sidebarButtonText}>Sign Out</Text>
       </TouchableOpacity>
@@ -35,8 +39,8 @@ const Sidebar = ({ navigation, closeModal }) => {
 const styles = StyleSheet.create({
   sidebarContainer: {
     flex: 1,
-    backgroundColor: '#FFF',
-    padding: 20,
+    backgroundColor: '#FFDAB9',
+    padding: 10,
     justifyContent: 'center',
   },
   closeButton: {
@@ -45,7 +49,7 @@ const styles = StyleSheet.create({
     right: 20,
   },
   closeButtonText: {
-    fontSize: 20,
+    fontSize: 30,
     color: '#000',
   },
   sidebarButton: {
@@ -55,8 +59,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   sidebarButtonText: {
-    fontSize: 18,
-    color: '#6200EE',
+    fontSize: 24,
+    color: '#000000',
   },
 });
 

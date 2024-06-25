@@ -9,6 +9,8 @@ import Calendar from './components/Calendar';
 import EventListing from './components/EventListing';
 import EventViewing from './components/EventViewing';
 import EventDetail from './components/EventDetail';
+import AboutUs from './components/AboutUs';
+import Profile from './components/Profile';
 
 const Stack = createStackNavigator();
 
@@ -23,6 +25,8 @@ export default function App() {
         <Stack.Screen name="EventListing" component={EventListing} />
         <Stack.Screen name="EventViewing" component={EventViewing} />
         <Stack.Screen name="EventDetail" component={EventDetail} />
+        <Stack.Screen name="AboutUs" component={AboutUs} />
+        <Stack.Screen name="Profile" component={Profile} />
         {/* Add more screens here */}
       </Stack.Navigator>
     </NavigationContainer>

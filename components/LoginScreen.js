@@ -21,7 +21,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <ImageBackground 
-      source={require('../assets/background-2.png')} 
+      source={require('../assets/background-3.png')} 
       style={styles.background}
     >
       <View style={styles.overlay} />
