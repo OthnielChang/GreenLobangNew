@@ -67,9 +67,9 @@ const EventDetail = ({ route }) => {
       <Text style={styles.date}>
         {moment(event.date).format('YYYY-MM-DD')} at {moment(event.time).format('HH:mm')}
       </Text>
-      {event.imageUri && (
+      {event.imageUrl && (
         <Image
-          source={{ uri: event.imageUri }}
+          source={{ uri: event.imageUrl }}
           style={styles.image}
           resizeMode="contain"
         />
