@@ -1,6 +1,6 @@
 // AboutUs.js
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native';
 
 const AboutUs = () => {
   return (
@@ -10,6 +10,10 @@ const AboutUs = () => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
+        <Image 
+          source={require('../assets/logo.png')} // Replace with your logo file path
+          style={styles.logo}
+        />
         <Text style={styles.title}>About Us</Text>
         <Text style={styles.content}>
         In the heart of Singapore lies the vibrant National University of Singapore (NUS), a melting pot of diverse cultures, cutting-edge research, and progressive ideas. Among the bustling activities and academic pursuits, a green wave is rising—a collective call for sustainability and environmental stewardship. Amidst this growing awareness, we envision an innovative solution: NUS GreenLobang, an app dedicated to fostering a sustainable campus community.
@@ -33,6 +37,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+  },
+  logo: {
+    width: 400,
+    height: 150,
+    resizeMode: 'contain', 
+    alignSelf: 'center', 
+    marginBottom: 10, 
   },
   title: {
     fontSize: 24,

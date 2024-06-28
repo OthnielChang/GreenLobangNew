@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
@@ -26,6 +26,10 @@ const LoginScreen = ({ navigation }) => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
+        <Image 
+          source={require('../assets/logo.png')} // Replace with your logo path
+          style={styles.logo}
+        />
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -75,6 +79,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+  },
+  logo: {
+    width: 300,
+    height: 150,
+    resizeMode: 'contain', 
+    alignSelf: 'center', 
+    marginBottom: 10, 
   },
   input: {
     height: 40,

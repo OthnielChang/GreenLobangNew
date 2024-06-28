@@ -6,6 +6,8 @@ import moment from 'moment';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db, auth } from '../firebaseConfig';
 
+const colors = ['#FFA07A', '#98FB98', '#1E90FF', '#F0E68C', '#D8BFD8', '#AFEEEE'];
+
 const EventListing = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -14,6 +16,7 @@ const EventListing = () => {
   const [imageUri, setImageUri] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  const [selectedColor, setSelectedColor] = useState(colors[0]); // Default color
 
   const handleChoosePhoto = () => {
     const options = {
@@ -41,6 +44,7 @@ const EventListing = () => {
         date: eventDate,
         time: eventTime,
         imageUri,
+        color: selectedColor, // Store the selected color
         userId: user.uid,
       });
       Alert.alert('Event Submitted', 'Your event has been submitted successfully!');
@@ -49,6 +53,7 @@ const EventListing = () => {
       setDate(null);
       setTime(null);
       setImageUri(null);
+      setSelectedColor(colors[0]); // Reset color
     } catch (error) {
       Alert.alert('Error', 'There was an error submitting your event.');
       console.error("Error adding document: ", error);
@@ -122,6 +127,16 @@ const EventListing = () => {
         onCancel={hideTimePicker}
       />
 
+      <Text style={styles.label}>Select Event Color</Text>
+      <View style={styles.colorsContainer}>
+        {colors.map(color => (
+          <TouchableOpacity
+            key={color}
+            style={[styles.colorButton, { backgroundColor: color }, selectedColor === color && styles.selectedColorButton]}
+            onPress={() => setSelectedColor(color)}
+          />
+        ))}
+      </View>
       <Button title="Choose Photo" onPress={handleChoosePhoto} />
       {imageUri && (
         <Image
@@ -160,6 +175,20 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 20,
+  },
+  colorsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  colorButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  selectedColorButton: {
+    borderWidth: 3,
+    borderColor: '#000',
   },
   image: {
     width: 100,

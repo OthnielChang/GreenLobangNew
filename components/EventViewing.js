@@ -54,7 +54,7 @@ const EventViewing = ({ navigation }) => {
 
   const renderEvent = ({ item }) => (
     <TouchableOpacity
-      style={styles.eventContainer}
+      style={[styles.eventContainer, { backgroundColor: item.color }]} // Apply the event color
       onPress={() =>
         navigation.navigate('EventDetail', {
           event: { ...item, date: item.date.toISOString(), time: item.time.toISOString() }, // Pass date and time as ISO strings
@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
   eventContainer: {
     padding: 16,
     marginBottom: 16,
-    backgroundColor: '#fff',
     borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.1,

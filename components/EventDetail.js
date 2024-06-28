@@ -1,11 +1,15 @@
-import React from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, Button, StyleSheet, Alert, Share } from 'react-native';
 import { db, auth } from '../firebaseConfig';
 import { doc, setDoc, collection } from 'firebase/firestore';
 import moment from 'moment';
 
 const EventDetail = ({ route }) => {
   const { event } = route.params;
+
+  useEffect(() => {
+    console.log("Event data:", event);
+  }, [event]);
 
   const handleAddToCalendar = async () => {
     try {
@@ -26,6 +30,36 @@ const EventDetail = ({ route }) => {
     }
   };
 
+  const handleShare = async () => {
+    const shareMessage = `Check out this upcoming NUS GreenLobang event:\n${event.title}\n${event.description}\n${moment(event.date).format('YYYY-MM-DD')} at ${moment(event.time).format('HH:mm')}`;
+
+    try {
+      const result = await Share.share({
+        message: shareMessage,
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // Shared with activity type of result.activityType
+        } else {
+          // Shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // Dismissed
+      }
+    } catch (error) {
+      console.error('Error sharing event: ', error);
+    }
+  };
+
+  if (!event) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Event data is missing.</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{event.title}</Text>
@@ -34,6 +68,9 @@ const EventDetail = ({ route }) => {
         {moment(event.date).format('YYYY-MM-DD')} at {moment(event.time).format('HH:mm')}
       </Text>
       <Button title="Add to My Calendar" onPress={handleAddToCalendar} />
+      <View style={{ marginTop: 10 }}>
+        <Button title="Share Event" onPress={handleShare} />
+      </View>
     </View>
   );
 };
@@ -56,6 +93,10 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 14,
     marginBottom: 16,
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
   },
 });
 
