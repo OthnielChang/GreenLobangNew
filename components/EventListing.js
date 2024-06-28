@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { View, Text, TextInput, Button, StyleSheet, Image, Alert, TouchableOpacity, Platform } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db, auth } from '../firebaseConfig';
+import { db, auth, storage } from '../firebaseConfig'; // Ensure storage is correctly imported
+import { getStorage, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 
-const colors = ['#FFA07A', '#98FB98', '#1E90FF', '#F0E68C', '#D8BFD8', '#AFEEEE'];
+const colors = ['#FFA07A', '#98FB98', '#1E90FF', '#FFFF00', '#D8BFD8', '#AFEEEE'];
 
 const EventListing = () => {
   const [title, setTitle] = useState('');
@@ -17,20 +18,73 @@ const EventListing = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [selectedColor, setSelectedColor] = useState(colors[0]); // Default color
+  const [imageChosen, setImageChosen] = useState(false); // New state to track image selection
 
-  const handleChoosePhoto = () => {
-    const options = {
-      noData: true,
-    };
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        setImageUri(response.assets[0].uri);
+  const requestGalleryPermission = async () => {
+    if (Platform.OS !== 'web') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Sorry, we need gallery permissions to make this work!');
       }
+    }
+  };
+
+  const handleChoosePhoto = async () => {
+    await requestGalleryPermission();
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri); // Updated to correctly set the image URI
+      setImageChosen(true); // Update state to indicate image was chosen
+    }
+  };
+
+  const uploadImage = async (uri) => {
+    if (!uri) {
+      console.log('No URI provided for the image.');
+      return null;
+    }
+  
+    try {
+      console.log('Fetching image from URI:', uri);
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      console.log('Image fetched and converted to blob.');
+  
+      const storageRef = ref(storage, `images/${auth.currentUser.uid}/${Date.now()}`);
+      const uploadTask = uploadBytesResumable(storageRef, blob);
+  
+      return new Promise((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            console.log('Upload in progress...', snapshot.bytesTransferred, '/', snapshot.totalBytes);
+          },
+          (error) => {
+            console.error('Upload failed:', error);
+            reject(error);
+          },
+          async () => {
+            try {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              console.log('Image uploaded successfully. Download URL:', downloadURL);
+              resolve(downloadURL);
+            } catch (error) {
+              console.error('Error getting download URL:', error);
+              reject(error);
+            }
+          },
+        );
+      });
+    } catch (error) {
+      console.error('Error during image fetch or upload:', error);
+      throw error;
+    }
   };
 
   const handleSubmit = async () => {
@@ -38,12 +92,14 @@ const EventListing = () => {
       const user = auth.currentUser;
       const eventDate = date ? Timestamp.fromDate(date) : null;
       const eventTime = time ? Timestamp.fromDate(time) : null;
+      const imageUrl = await uploadImage(imageUri);
+
       await addDoc(collection(db, 'events'), {
         title,
         description,
         date: eventDate,
         time: eventTime,
-        imageUri,
+        imageUrl,
         color: selectedColor, // Store the selected color
         userId: user.uid,
       });
@@ -54,6 +110,7 @@ const EventListing = () => {
       setTime(null);
       setImageUri(null);
       setSelectedColor(colors[0]); // Reset color
+      setImageChosen(false); // Reset image chosen state
     } catch (error) {
       Alert.alert('Error', 'There was an error submitting your event.');
       console.error("Error adding document: ", error);
@@ -138,6 +195,7 @@ const EventListing = () => {
         ))}
       </View>
       <Button title="Choose Photo" onPress={handleChoosePhoto} />
+      {imageChosen && <Text>Image chosen</Text>}
       {imageUri && (
         <Image
           source={{ uri: imageUri }}

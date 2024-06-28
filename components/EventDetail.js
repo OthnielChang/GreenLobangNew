@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, Button, StyleSheet, Alert, Share } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert, Share, Image } from 'react-native';
 import { db, auth } from '../firebaseConfig';
 import { doc, setDoc, collection } from 'firebase/firestore';
 import moment from 'moment';
@@ -67,6 +67,13 @@ const EventDetail = ({ route }) => {
       <Text style={styles.date}>
         {moment(event.date).format('YYYY-MM-DD')} at {moment(event.time).format('HH:mm')}
       </Text>
+      {event.imageUri && (
+        <Image
+          source={{ uri: event.imageUri }}
+          style={styles.image}
+          resizeMode="contain"
+        />
+      )}
       <Button title="Add to My Calendar" onPress={handleAddToCalendar} />
       <View style={{ marginTop: 10 }}>
         <Button title="Share Event" onPress={handleShare} />
@@ -92,6 +99,11 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 14,
+    marginBottom: 16,
+  },
+  image: {
+    width: '100%',
+    height: 200,
     marginBottom: 16,
   },
   errorText: {
