@@ -5,7 +5,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db, auth, storage } from '../firebaseConfig'; // Ensure storage is correctly imported
-import { getStorage, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 
 const colors = ['#FFA07A', '#98FB98', '#1E90FF', '#FFFF00', '#D8BFD8', '#AFEEEE'];
 
@@ -35,7 +35,7 @@ const EventListing = () => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.5,
     });
 
     if (!result.canceled) {
