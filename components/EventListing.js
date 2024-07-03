@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db, auth, storage } from '../firebaseConfig'; // Ensure storage is correctly imported
+import { db, auth, storage } from '../firebaseConfig'; 
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 
 const colors = ['#FFA07A', '#98FB98', '#1E90FF', '#FFFF00', '#D8BFD8', '#AFEEEE'];

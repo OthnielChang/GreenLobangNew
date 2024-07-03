@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../firebaseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import moment from 'moment';
 
 const Calendar = () => {
   const [userEvents, setUserEvents] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUserEvents = async () => {
@@ -34,13 +36,16 @@ const Calendar = () => {
   }, []);
 
   const renderEvent = ({ item }) => (
-    <View style={styles.eventContainer}>
+    <TouchableOpacity
+      style={styles.eventContainer}
+      onPress={() => navigation.navigate('EventDetail', { event: item })}
+    >
       <Text style={styles.eventTitle}>{item.title}</Text>
       <Text style={styles.eventDescription}>{item.description}</Text>
       <Text style={styles.eventDate}>
         {moment(item.date).format('YYYY-MM-DD')} at {moment(item.time).format('HH:mm')}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

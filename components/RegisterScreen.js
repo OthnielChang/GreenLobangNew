@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ImageBackground } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
@@ -9,21 +9,24 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
 
-  const handleSignUp = async () => {
+  const handleRegister = async () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Add user to Firestore
-      await setDoc(doc(db, 'users', user.uid), {
+      // Initialize user document in Firestore
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, {
         email: user.email,
-        username: username, // Add username field
+        username: username,
+        points: 0,
+        claimedEvents: [],
       });
 
-      Alert.alert('Registration successful!', 'You are now registered.');
+      Alert.alert('Success', 'User registered successfully');
       navigation.navigate('Login');
     } catch (error) {
-      Alert.alert('Registration failed!', error.message);
+      Alert.alert('Error', error.message || 'An error occurred');
     }
   };
 
@@ -32,8 +35,8 @@ const RegisterScreen = ({ navigation }) => {
       source={require('../assets/background-3.png')}
       style={styles.background}
     >
-      <View style={styles.overlay} />
       <View style={styles.container}>
+        <Text style={styles.title}>Register</Text>
         <TextInput
           style={styles.input}
           placeholder="Username"
@@ -45,15 +48,22 @@ const RegisterScreen = ({ navigation }) => {
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
-          secureTextEntry
           value={password}
           onChangeText={setPassword}
+          secureTextEntry
         />
-        <Button title="Sign Up" onPress={handleSignUp} />
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <Text style={styles.buttonText}>Register</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.buttonText}>Already have an account? Login</Text>
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
@@ -62,24 +72,43 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: 'cover',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Optional: to add a semi-transparent overlay
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    width: '80%',
     padding: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 10,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
+    width: '100%',
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: '#fff',
     borderWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Make input fields more readable over the background
+    borderColor: '#ddd',
+    borderRadius: 5,
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  loginButton: {
+    backgroundColor: '#28A745',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

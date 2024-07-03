@@ -11,6 +11,7 @@ const Profile = () => {
   const [email, setEmail] = useState(user ? user.email : '');
   const [username, setUsername] = useState('');
   const [newUsername, setNewUsername] = useState('');
+  const [points, setPoints] = useState(0);
 
   useEffect(() => {
     fetchUserData();
@@ -22,7 +23,9 @@ const Profile = () => {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        setUsername(docSnap.data().username || '');
+        const userData = docSnap.data();
+        setUsername(userData.username || '');
+        setPoints(userData.points || 0);
       }
     } catch (error) {
       console.log('Error fetching user data:', error);
@@ -46,6 +49,7 @@ const Profile = () => {
       <Text style={styles.title}>Profile</Text>
       <Text style={styles.emailText}>Email: {email}</Text>
       <Text style={styles.usernameText}>Username: {username}</Text>
+      <Text style={styles.pointsText}>Points: {points}</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter new username"
@@ -78,6 +82,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   usernameText: {
+    fontSize: 18,
+    color: '#000',
+    marginBottom: 20,
+  },
+  pointsText: {
     fontSize: 18,
     color: '#000',
     marginBottom: 20,
