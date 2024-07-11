@@ -3,17 +3,20 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Modal
 import { FontAwesome } from '@expo/vector-icons';
 import { signOut, getAuth } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import axios from 'axios';
 import { db } from '../firebaseConfig';
 import Sidebar from './Sidebar'; // Import your custom Sidebar component
 
 const HomeScreen = ({ navigation }) => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [username, setUsername] = useState('');
+  const [weather, setWeather] = useState(null);
   const auth = getAuth();
   const user = auth.currentUser;
 
   useEffect(() => {
     fetchUsername();
+    fetchWeather();
   }, []);
 
   const fetchUsername = async () => {
@@ -26,6 +29,17 @@ const HomeScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.log('Error fetching username:', error);
+    }
+  };
+
+  const fetchWeather = async () => {
+    try {
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?q=Singapore&appid=7e1a56036c30a90af179522236eacfc4&units=metric`
+      );
+      setWeather(response.data);
+    } catch (error) {
+      console.log('Error fetching weather data:', error);
     }
   };
 
@@ -53,6 +67,16 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Welcome Back {username} !</Text>
         </View>
+
+        {weather && (
+          <View style={styles.weatherContainer}>
+            <View style={styles.weatherWidget}>
+              <Text style={styles.weatherLocation}>{weather.name}, {weather.sys.country}</Text>
+              <Text style={styles.weatherTemp}>{Math.round(weather.main.temp)}°C</Text>
+              <Text style={styles.weatherDescription}>{weather.weather[0].description}</Text>
+            </View>
+          </View>
+        )}
 
         <Modal
           animationType="slide"
@@ -136,6 +160,34 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  weatherContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  weatherWidget: {
+    backgroundColor: '#FAC898',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+  },
+  weatherLocation: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  weatherTemp: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  weatherDescription: {
+    fontSize: 18,
+    color: '#333',
+  },
   buttonsContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -152,7 +204,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: '#FAC898',
-    padding: 15,
+    padding: 15, //button size
     borderRadius: 10,
     marginHorizontal: 10,
     width: '45%',
@@ -160,8 +212,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
+    shadowRadius: 2
   },
   buttonImage: {
     width: 50,
