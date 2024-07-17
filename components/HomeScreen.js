@@ -119,6 +119,16 @@ const HomeScreen = ({ navigation }) => {
 
             <TouchableOpacity
               style={styles.button}
+              onPress={() => navigation.navigate('MapComponent')}
+            >
+              <Image source={require('../assets/map.png')} style={styles.buttonImage} />
+              <Text style={styles.buttonText}>Map</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={styles.button}
               onPress={handleSignOut}
             >
               <Image source={require('../assets/logout.png')} style={styles.buttonImage} />

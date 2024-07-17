@@ -11,6 +11,8 @@ import EventViewing from './components/EventViewing';
 import EventDetail from './components/EventDetail';
 import AboutUs from './components/AboutUs';
 import Profile from './components/Profile';
+import MapComponent from './components/MapComponent';
+
 
 const Stack = createStackNavigator();
 
@@ -27,6 +29,7 @@ export default function App() {
         <Stack.Screen name="EventDetail" component={EventDetail} />
         <Stack.Screen name="AboutUs" component={AboutUs} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="MapComponent" component={MapComponent} />
         {/* Add more screens here */}
       </Stack.Navigator>
     </NavigationContainer>
