@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../firebaseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
@@ -17,12 +17,21 @@ const Calendar = () => {
           const q = query(userEventsRef);
           const querySnapshot = await getDocs(q);
           const eventsData = [];
+          const currentTime = new Date();
           querySnapshot.forEach((doc) => {
             const eventData = doc.data();
             eventData.date = eventData.date.toDate(); // Convert Firestore Timestamp to Date
             eventData.time = eventData.time.toDate(); // Convert Firestore Timestamp to Date
-            eventsData.push({ ...eventData, id: doc.id });
+
+            // Only include events that have not expired
+            if (eventData.date >= currentTime) {
+              eventsData.push({ ...eventData, id: doc.id });
+            }
           });
+
+          // Sort events by date in descending order
+          eventsData.sort((a, b) => b.date - a.date);
+
           setUserEvents(eventsData);
         } else {
           Alert.alert('Error', 'You must be logged in to view your calendar');
@@ -50,12 +59,30 @@ const Calendar = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={userEvents}
-        keyExtractor={(item) => item.id}
-        renderItem={renderEvent}
-        contentContainerStyle={styles.listContent}
-      />
+      {userEvents.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Empty day? Press the button below to add events!</Text>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate('EventViewing')}
+          >
+            <Text style={styles.addButtonText}>Go to EventViewing</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={userEvents}
+          keyExtractor={(item) => item.id}
+          renderItem={renderEvent}
+          contentContainerStyle={styles.listContent}
+        />
+      )}
+      <TouchableOpacity
+        style={styles.addEventButton}
+        onPress={() => navigation.navigate('EventViewing')}
+      >
+        <Text style={styles.addEventButtonText}>Add Event</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -64,6 +91,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#F5F5F5',
   },
   listContent: {
     paddingBottom: 16,
@@ -71,16 +99,18 @@ const styles = StyleSheet.create({
   eventContainer: {
     padding: 16,
     marginBottom: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
+    elevation: 3,
   },
   eventTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
   },
   eventDescription: {
     marginTop: 8,
@@ -91,6 +121,39 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 12,
     color: '#888',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#888',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  addButton: {
+    backgroundColor: '#1E90FF',
+    padding: 10,
+    borderRadius: 5,
+  },
+  addButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  addEventButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  addEventButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
