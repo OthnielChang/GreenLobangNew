@@ -19,7 +19,14 @@ const MapComponent = () => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission to access location was denied');
+        Alert.alert(
+          'Permission required',
+          'Permission to access location was denied. Please enable location permissions in your settings.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openURL('app-settings:') },
+          ]
+        );
         return;
       }
 
@@ -27,7 +34,7 @@ const MapComponent = () => {
       setRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
-        latitudeDelta: LATITUDE_DELTA, 
+        latitudeDelta: LATITUDE_DELTA,
         longitudeDelta: LONGITUDE_DELTA,
       });
     })();

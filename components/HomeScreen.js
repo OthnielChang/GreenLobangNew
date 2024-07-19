@@ -103,7 +103,7 @@ const HomeScreen = ({ navigation }) => {
               style={styles.button}
               onPress={() => navigation.navigate('EventListing')}
             >
-              <Image source={require('../assets/event-listing.png')} style={styles.buttonImage} />
+              <Image source={require('../assets/to-do-list.png')} style={styles.buttonImage} />
               <Text style={styles.buttonText}>Event Listing</Text>
             </TouchableOpacity>
           </View>
@@ -113,7 +113,7 @@ const HomeScreen = ({ navigation }) => {
               style={styles.button}
               onPress={() => navigation.navigate('EventViewing')}
             >
-              <Image source={require('../assets/event-viewing.png')} style={styles.buttonImage} />
+              <Image source={require('../assets/file.png')} style={styles.buttonImage} />
               <Text style={styles.buttonText}>Event Viewing</Text>
             </TouchableOpacity>
 
@@ -129,9 +129,17 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.button}
+              onPress={() => navigation.navigate('Rewards')}
+            >
+              <Image source={require('../assets/reward.png')} style={styles.buttonImage} />
+              <Text style={styles.buttonText}>Rewards</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.button}
               onPress={handleSignOut}
             >
-              <Image source={require('../assets/logout.png')} style={styles.buttonImage} />
+              <Image source={require('../assets/log-out.png')} style={styles.buttonImage} />
               <Text style={styles.buttonText}>Sign Out</Text>
             </TouchableOpacity>
           </View>

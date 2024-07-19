@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { db, auth } from '../firebaseConfig';
-import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import moment from 'moment';
-import Swiper from 'react-native-swiper';
+import CalendarStrip from 'react-native-calendar-strip';
 import { Timestamp } from 'firebase/firestore';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const EventViewing = ({ navigation }) => {
   const [events, setEvents] = useState([]);
@@ -28,13 +29,9 @@ const EventViewing = ({ navigation }) => {
             if (eventData.date && eventData.time) {
               eventData.date = eventData.date.toDate(); // Convert Firestore Timestamp to Date
               eventData.time = eventData.time.toDate(); // Convert Firestore Timestamp to Date
-              console.log("Fetched event:", eventData); // Debug: Log fetched event
               eventsData.push({ ...eventData, id: doc.id });
-            } else {
-              console.warn("Missing date or time in event:", eventData); //to handle missing data gracefully
             }
           });
-          console.log("All fetched events:", eventsData); // Debug: Log all fetched events
           setEvents(eventsData);
         } else {
           Alert.alert('Error', 'You must be logged in to view events');
@@ -48,54 +45,56 @@ const EventViewing = ({ navigation }) => {
   }, [selectedDay]);
 
   const handleDayPress = (day) => {
-    setSelectedDay(new Date(day));
-    console.log("Selected day:", day); // Debug: Log selected day
+    setSelectedDay(day);
   };
 
   const renderEvent = ({ item }) => (
     <TouchableOpacity
-      style={[styles.eventContainer, { backgroundColor: item.color }]} // Apply the event color
+      style={[styles.eventContainer, { backgroundColor: item.color || '#FF7043' }]}
       onPress={() =>
         navigation.navigate('EventDetail', {
-          event: { ...item, date: item.date.toISOString(), time: item.time.toISOString() }, // Pass date and time as ISO strings
+          event: {
+            ...item,
+            date: item.date.toISOString(),  // Convert Date to ISO string
+            time: item.time.toISOString(),  // Convert Date to ISO string
+          },
         })
       }
     >
       <Text style={styles.eventTitle}>{item.title}</Text>
       <Text style={styles.eventDescription}>{item.description}</Text>
-      <Text style={styles.eventDate}>
-        {moment(item.date).format('YYYY-MM-DD')} at {moment(item.time).format('HH:mm')}
-      </Text>
+      <View style={styles.eventDateContainer}>
+        <MaterialIcons name="event" size={14} color="#888" />
+        <Text style={styles.eventDate}>
+          {moment(item.date).format('YYYY-MM-DD')} at {moment(item.time).format('HH:mm')}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 
-  const renderDays = () => {
-    const days = [];
-    for (let i = -3; i <= 3; i++) {
-      const day = new Date();
-      day.setDate(selectedDay.getDate() + i);
-      days.push(day);
-    }
-    return days.map((day, index) => (
-      <TouchableOpacity key={index} onPress={() => handleDayPress(day)}>
-        <Text style={[styles.dayText, day.toDateString() === selectedDay.toDateString() && styles.selectedDayText]}>
-          {day.toDateString()}
-        </Text>
-      </TouchableOpacity>
-    ));
-  };
-
   return (
     <View style={styles.container}>
-      <Swiper showsPagination={false} loop={false} index={3}>
-        {renderDays()}
-      </Swiper>
-      <FlatList
-        data={events}
-        keyExtractor={(item) => item.id}
-        renderItem={renderEvent}
-        contentContainerStyle={styles.listContent}
+      <CalendarStrip
+        style={styles.calendarStrip}
+        selectedDate={selectedDay}
+        onDateSelected={handleDayPress}
+        highlightDateNumberStyle={styles.selectedDate}
+        highlightDateNameStyle={styles.selectedDate}
+        dateNumberStyle={styles.dateNumber}
+        dateNameStyle={styles.dateName}
       />
+      {events.length === 0 ? (
+        <View style={styles.noEventsContainer}>
+          <Text style={styles.noEventsText}>No events for this day, look at other days!</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={events}
+          keyExtractor={(item) => item.id}
+          renderItem={renderEvent}
+          contentContainerStyle={styles.listContent}
+        />
+      )}
     </View>
   );
 };
@@ -103,41 +102,63 @@ const EventViewing = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: '#F5F5F5',
+  },
+  calendarStrip: {
+    height: 100,
+    paddingTop: 20,
+    paddingBottom: 10,
   },
   listContent: {
-    paddingBottom: 16,
+    padding: 16,
   },
   eventContainer: {
     padding: 16,
     marginBottom: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
   },
   eventTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 8,
   },
   eventDescription: {
-    marginTop: 8,
     fontSize: 14,
     color: '#555',
+    marginBottom: 8,
+  },
+  eventDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   eventDate: {
-    marginTop: 8,
-    fontSize: 12,
+    marginLeft: 4,
+    fontSize: 14,
     color: '#888',
   },
-  dayText: {
-    fontSize: 16,
-    padding: 8,
+  dateNumber: {
+    color: '#000',
   },
-  selectedDayText: {
-    fontWeight: 'bold',
+  dateName: {
+    color: '#000',
+  },
+  selectedDate: {
     color: 'blue',
+  },
+  noEventsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  noEventsText: {
+    fontSize: 18,
+    color: '#FF7043',
+    textAlign: 'center',
   },
 });
 
