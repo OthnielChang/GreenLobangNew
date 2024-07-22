@@ -13,6 +13,7 @@ import AboutUs from './components/AboutUs';
 import Profile from './components/Profile';
 import MapComponent from './components/MapComponent';
 import Rewards from './components/Rewards';
+import RedeemedRewards from './components/RedeemedRewards';
 
 
 const Stack = createStackNavigator();
@@ -32,6 +33,7 @@ export default function App() {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="MapComponent" component={MapComponent} />
         <Stack.Screen name="Rewards" component={Rewards} />
+        <Stack.Screen name="RedeemedRewards" component={RedeemedRewards} />
         {/* Add more screens here */}
       </Stack.Navigator>
     </NavigationContainer>

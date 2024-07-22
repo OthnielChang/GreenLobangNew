@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { auth, db } from '../firebaseConfig'; // Import your Firebase configuration
-import { getDoc, doc, collection, getDocs, updateDoc } from 'firebase/firestore';
+import { getDoc, doc, collection, getDocs, updateDoc, addDoc, setDoc } from 'firebase/firestore';
 
-const RewardsScreen = () => {
+const Rewards = () => {
   const [userPoints, setUserPoints] = useState(0);
   const [rewards, setRewards] = useState([]);
 
@@ -33,6 +33,15 @@ const RewardsScreen = () => {
       const userRef = doc(db, 'users', auth.currentUser.uid);
       await updateDoc(userRef, {
         points: userPoints - reward.cost,
+      });
+
+      // setdoc allowing me to create the collection if it doesnt already exist
+      const redeemedRewardRef = doc(db, 'users', auth.currentUser.uid, 'redeemedRewards', reward.id);
+      await setDoc(redeemedRewardRef, {
+        name: reward.name,
+        description: reward.description,
+        cost: reward.cost,
+        redeemedAt: new Date(),
       });
 
       Alert.alert('Success', `You have redeemed ${reward.name}`);
@@ -97,4 +106,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RewardsScreen;
+export default Rewards;

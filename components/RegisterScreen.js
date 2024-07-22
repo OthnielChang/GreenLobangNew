@@ -21,6 +21,7 @@ const RegisterScreen = ({ navigation }) => {
         username: username,
         points: 0,
         claimedEvents: [],
+        redeemedRewards: [],
       });
 
       Alert.alert('Success', 'User registered successfully');

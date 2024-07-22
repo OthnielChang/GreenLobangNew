@@ -29,6 +29,9 @@ const Sidebar = ({ navigation, closeModal }) => {
       <TouchableOpacity style={styles.sidebarButton} onPress={() => { navigation.navigate('AboutUs'); closeModal(); }}>
         <Text style={styles.sidebarButtonText}>About Us</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.sidebarButton} onPress={() => { navigation.navigate('RedeemedRewards'); closeModal(); }}>
+        <Text style={styles.sidebarButtonText}>Redeemed Rewards</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.sidebarButton} onPress={handleSignOut}>
         <Text style={styles.sidebarButtonText}>Sign Out</Text>
       </TouchableOpacity>
