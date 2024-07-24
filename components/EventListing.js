@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image, Alert, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, Image, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
@@ -194,7 +194,10 @@ const EventListing = () => {
           />
         ))}
       </View>
-      <Button title="Choose Photo" onPress={handleChoosePhoto} />
+      
+      <TouchableOpacity style={[styles.button, styles.choosePhotoButton]} onPress={handleChoosePhoto}>
+        <Text style={styles.buttonText}>Choose Photo</Text>
+      </TouchableOpacity>
       {imageChosen && <Text>Image chosen</Text>}
       {imageUri && (
         <Image
@@ -203,7 +206,9 @@ const EventListing = () => {
         />
       )}
 
-      <Button title="Submit Event" onPress={handleSubmit} />
+      <TouchableOpacity style={[styles.button, styles.submitEventButton]} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Submit Event</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -253,6 +258,22 @@ const styles = StyleSheet.create({
     height: 100,
     marginTop: 20,
     marginBottom: 20,
+  },
+  button: {
+    borderRadius: 5,
+    padding: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  choosePhotoButton: {
+    backgroundColor: '#FFA07A', // Light orange color for "Choose Photo" button
+  },
+  submitEventButton: {
+    backgroundColor: '#98FB98', // Light green color for "Submit Event" button
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

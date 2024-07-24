@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   rewardContainer: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#D5DBDB',
     padding: 15,
     marginBottom: 10,
     borderRadius: 10,
