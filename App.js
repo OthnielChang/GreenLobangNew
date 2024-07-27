@@ -14,7 +14,7 @@ import Profile from './components/Profile';
 import MapComponent from './components/MapComponent';
 import Rewards from './components/Rewards';
 import RedeemedRewards from './components/RedeemedRewards';
-
+import PasswordResetScreen from './components/PasswordResetScreen';
 
 const Stack = createStackNavigator();
 
@@ -34,6 +34,7 @@ export default function App() {
         <Stack.Screen name="MapComponent" component={MapComponent} />
         <Stack.Screen name="Rewards" component={Rewards} />
         <Stack.Screen name="RedeemedRewards" component={RedeemedRewards} />
+        <Stack.Screen name="PasswordReset" component={PasswordResetScreen} />
         {/* Add more screens here */}
       </Stack.Navigator>
     </NavigationContainer>

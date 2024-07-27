@@ -9,13 +9,27 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false); // State for password visibility
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum eight characters, at least one letter and one number
+
   const handleLogin = async () => {
+    if (!email.includes('@') || !email.includes('.com')) {
+      Alert.alert('Invalid Email!', 'Ensure correct email is used. If new user, please register below.');
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       Alert.alert('Login Successful!', 'You are logged in.');
       navigation.replace('Home');
     } catch (error) {
-      Alert.alert('Login Failed!', error.message);
+      if (error.code === 'auth/invalid-credential') {
+        Alert.alert('Login Failed!', 'Ensure correct email and password is used. If new user, please register below. Registered? Press Forget Password to reset!');
+      } else if (error.code === 'auth/too-many-requests') {
+        Alert.alert('Login Failed!', 'Account has been temporarily locked due to multiple failed attempts. Try again later!');
+      } else {
+        Alert.alert('Login Failed!', error.message);
+      }
     }
   };
 
@@ -59,6 +73,11 @@ const LoginScreen = ({ navigation }) => {
         <Button
           title="Don't have an account? Register"
           onPress={() => navigation.navigate('Register')}
+          color="#841584"
+        />
+        <Button
+          title="Forgot Password?"
+          onPress={() => navigation.navigate('PasswordReset')}
           color="#841584"
         />
       </View>

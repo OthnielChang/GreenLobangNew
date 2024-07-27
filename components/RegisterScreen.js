@@ -9,7 +9,28 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  // Regex to validate a password with the following criteria:
+  // - Minimum eight characters
+  // - At least one lowercase letter
+  // - At least one uppercase letter
+  // - At least one digit
+  // - No special characters allowed
+  // - No whitespace allowed
+
+
   const handleRegister = async () => {
+    if (!email.includes('@') || !email.includes('.com')) {
+      Alert.alert('Invalid Email!', 'Ensure correct email is used.');
+      return;
+    }
+
+    if (!passwordRegex.test(password)) {
+      Alert.alert('Invalid Password!', 'Password must be at least 8 characters long, include at least one lowercase letter, one uppercase letter, one digit, and contain no special characters or whitespace.');
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -27,7 +48,11 @@ const RegisterScreen = ({ navigation }) => {
       Alert.alert('Success', 'User registered successfully');
       navigation.navigate('Login');
     } catch (error) {
-      Alert.alert('Error', error.message || 'An error occurred');
+      if (error.code === 'auth/email-already-in-use') {
+        Alert.alert('Email Already in Use', 'Email has already been registered before. Proceed to log in. If you forget the password, please reset it.');
+      } else {
+        Alert.alert('Error', error.message || 'An error occurred');
+      }
     }
   };
 
