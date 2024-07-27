@@ -11,12 +11,16 @@ const AboutUs = () => {
       <View style={styles.overlay} />
       <View style={styles.container}>
         <Image 
-          source={require('../assets/logo.png')} // Replace with your logo file path
+          source={require('../assets/logo.png')}
           style={styles.logo}
         />
         <Text style={styles.title}>About Us</Text>
         <Text style={styles.content}>
-        In the heart of Singapore lies the vibrant National University of Singapore (NUS), a melting pot of diverse cultures, cutting-edge research, and progressive ideas. Among the bustling activities and academic pursuits, a green wave is rising—a collective call for sustainability and environmental stewardship. Amidst this growing awareness, we envision an innovative solution: NUS GreenLobang, an app dedicated to fostering a sustainable campus community.
+        We want to create a one-stop platform sharing sustainability practices or events in NUS. This platform will be a hub for students, faculty and staff to engage, collaborate and contribute to sustainability initiatives. 
+        By implementing a reward system, we aim to incentivise and recognise sustainable behaviours, thereby upholding and promoting a culture of sustainability across NUS. {"\n"}{"\n"}
+        Another side aim is the potential to bolster participation in sustainable events within the NUS community. With a point system, collaborating with various platforms and companies allows us to reward students for taking part in these sustainability events. 
+        As students strive to accrue points to earn attractive rewards, we hope to ensure a consistent influx of eager participants.{"\n"}{"\n"}
+        GreenLobang is proudly created by Othniel Chang and Sean Wong
         </Text>
       </View>
     </ImageBackground>
@@ -54,7 +58,7 @@ const styles = StyleSheet.create({
   content: {
     fontSize: 16,
     color: '#fff',
-    textAlign: 'center',
+    textAlign: 'justify',
   },
 });
 

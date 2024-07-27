@@ -46,15 +46,12 @@ const EventListing = () => {
 
   const uploadImage = async (uri) => {
     if (!uri) {
-      console.log('No URI provided for the image.');
       return null;
     }
   
     try {
-      console.log('Fetching image from URI:', uri);
       const response = await fetch(uri);
       const blob = await response.blob();
-      console.log('Image fetched and converted to blob.');
   
       const storageRef = ref(storage, `images/${auth.currentUser.uid}/${Date.now()}`);
       const uploadTask = uploadBytesResumable(storageRef, blob);
@@ -63,7 +60,6 @@ const EventListing = () => {
         uploadTask.on(
           'state_changed',
           (snapshot) => {
-            console.log('Upload in progress...', snapshot.bytesTransferred, '/', snapshot.totalBytes);
           },
           (error) => {
             console.error('Upload failed:', error);
@@ -72,7 +68,6 @@ const EventListing = () => {
           async () => {
             try {
               const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-              console.log('Image uploaded successfully. Download URL:', downloadURL);
               resolve(downloadURL);
             } catch (error) {
               console.error('Error getting download URL:', error);
@@ -82,7 +77,6 @@ const EventListing = () => {
         );
       });
     } catch (error) {
-      console.error('Error during image fetch or upload:', error);
       throw error;
     }
   };

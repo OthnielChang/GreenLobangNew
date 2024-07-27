@@ -108,13 +108,13 @@ const MapComponent = () => {
             title={marker.title}
           />
         ))}
-      </MapView>
-      <View style={styles.attributionContainer}>
+      </MapView> 
+      <View style={styles.attributionContainer}> 
         <Text style={styles.attributionText}>
           Map data © OneMap contributors | Singapore Land Authority
         </Text>
       </View>
-    </View>
+    </View>//credits
   );
 };
 

@@ -5,7 +5,7 @@ import { signOut, getAuth } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import axios from 'axios';
 import { db } from '../firebaseConfig';
-import Sidebar from './Sidebar'; // Import your custom Sidebar component
+import Sidebar from './Sidebar';
 
 const HomeScreen = ({ navigation }) => {
   const [sidebarVisible, setSidebarVisible] = useState(false);

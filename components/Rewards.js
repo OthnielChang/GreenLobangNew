@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
-import { auth, db } from '../firebaseConfig'; // Import your Firebase configuration
+import { auth, db } from '../firebaseConfig';
 import { getDoc, doc, collection, getDocs, updateDoc, addDoc, setDoc } from 'firebase/firestore';
 
 const Rewards = () => {
@@ -11,7 +11,7 @@ const Rewards = () => {
     const fetchUserPoints = async () => {
       const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
       if (userDoc.exists()) {
-        setUserPoints(userDoc.data().points);
+        setUserPoints(userDoc.data().points); //if doesnt alr exist
       }
     };
 
@@ -32,7 +32,7 @@ const Rewards = () => {
     if (userPoints >= reward.cost) {
       const userRef = doc(db, 'users', auth.currentUser.uid);
       await updateDoc(userRef, {
-        points: userPoints - reward.cost,
+        points: userPoints - reward.cost, //deduct
       });
 
       // setdoc allowing me to create the collection if it doesnt already exist

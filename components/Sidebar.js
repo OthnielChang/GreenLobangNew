@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { signOut } from 'firebase/auth';
-import { auth } from '../firebaseConfig'; // Ensure this path is correct
+import { auth } from '../firebaseConfig'; 
 
 const Sidebar = ({ navigation, closeModal }) => {
 

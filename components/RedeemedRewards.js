@@ -13,7 +13,7 @@ const RedeemedRewards = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      setRedeemedRewards(rewardsList);
+      setRedeemedRewards(rewardsList); // if it doesnt alr exist
     };
 
     fetchRedeemedRewards();

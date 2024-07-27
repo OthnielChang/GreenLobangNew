@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../firebaseConfig';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, getDocs } from 'firebase/firestore';
 import moment from 'moment';
 
 const Calendar = () => {
@@ -44,7 +44,7 @@ const Calendar = () => {
     fetchUserEvents();
   }, []);
 
-  const renderEvent = ({ item }) => (
+  const renderEvent = ({ item }) => ( // takes in event and lists it out
     <TouchableOpacity
       style={styles.eventContainer}
       onPress={() => navigation.navigate('EventDetail', { event: item })}
@@ -71,8 +71,8 @@ const Calendar = () => {
         </View>
       ) : (
         <FlatList
-          data={userEvents}
-          keyExtractor={(item) => item.id}
+          data={userEvents} //take data from userEvents from firebase
+          keyExtractor={(item) => item.id} //for id
           renderItem={renderEvent}
           contentContainerStyle={styles.listContent}
         />
