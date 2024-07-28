@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, Image, Platform } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, Image, Platform, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
@@ -138,7 +138,7 @@ const EventListing = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.label}>Event Title</Text>
       <TextInput
         style={styles.input}
@@ -203,7 +203,7 @@ const EventListing = () => {
       <TouchableOpacity style={[styles.button, styles.submitEventButton]} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit Event</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   colorsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   colorButton: {
     width: 40,
@@ -260,9 +260,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   choosePhotoButton: {
+    marginBottom: 20,
     backgroundColor: '#FFA07A', // Light orange color for "Choose Photo" button
   },
   submitEventButton: {
+    marginBottom: 40,
     backgroundColor: '#98FB98', // Light green color for "Submit Event" button
   },
   buttonText: {
